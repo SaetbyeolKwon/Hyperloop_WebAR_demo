@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Hyperloop webXR</title>
+		<meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.js" crossorigin="anonymous"></script>
+        <script src = "https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
+        <script src = "https://unpkg.com/three@0.126.0/examples/js/controls/OrbitControls.js"></script>
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    </head>
+    <body>
+        <script type="module">
+            import { ARButton } from 'https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js';
+
+            let camera, scene, renderer;
+            let controller;
+            let tunnel, rail;
+
+            init();
+            animate();
+
+            function init() {
+                const container = document.createElement('div');
+                document.body.appendChild(container);
+
+                scene = new THREE.Scene();
+
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 100);
+                // camera.position.z = 1;
+
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                //WebXR 쓸때만 렌더
+                renderer.xr.enabled = true;
+                container.appendChild(renderer.domElement);
+
+                /*
+                //Orbit
+                var controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.campingFactor = 0.25;
+                controls.enableZoom = true;
+                controls.minDistance = 0.1;
+                controls.maxDistance = 100;
+
+                //Raycaster
+                var raycaster = new THREE.Raycaster();
+                var mouse = new THREE.Vector2();
+
+                //camera perspective
+                var cameraRig, activeCamera, activeHelper;
+                var cameraPerspective;
+                var cameraPerspectiveHelper;
+                var aspect = window.innerWidth / window.innerHeight;
+                */
+
+                //Light
+                var light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+                light.position.set(0.5, 1, 0.25);
+                scene.add(light);
+
+                //Controller
+                controller = renderer.xr.getController(0);
+                controller.addEventListener('select', onSelect);
+                scene.add(controller);
+
+                //GLTF Loader
+                var group = new THREE.Group();
+                var loader = new THREE.GLTFLoader();
+                loader.load('objects/Hyperloop_tunnel.gltf',
+                    function ( gltf ) {
+                        tunnel = gltf.scene;
+                        group.add(tunnel);
+                });
+                loader.load('objects/Hyperloop_rail.gltf',
+                    function ( gltf ) {
+                        rail = gltf.scene;
+                        group.add(rail);
+                });
+                scene.add(group);
+                group.position.set(0.3,0,-2);
+                group.rotation.set(0,45,0);
+                group.scale.set(0.1,0.1,0.1);
+
+                //AR Button
+                const button = ARButton.createButton(renderer);
+                document.body.appendChild(button);
+
+                window.addEventListener('resize', onWindowResize, false);
+            }
+
+            function onSelect() {
+                var duration = 0.5;
+                var tl = gsap.timeline({repeat: 2, repeatDelay: 1});
+
+                tl.to(rail.position, duration, {x:0, ease: Expo.easeOut})
+                .to(rail.position, duration, {x:30, ease: Expo.easeOut})
+                .to(rail.rotation, 3, {y: Math.PI, ease: Expo.easeOut})
+                .to(rail.position, duration, {x:0, ease: Expo.easeOut})
+                .to(rail.position, duration, {x:-30, ease: Expo.easeOut})
+                .to(rail.rotation, 3, {y: Math.PI, ease: Expo.easeOut})
+                .to(rail.position, duration, {x:0, ease: Expo.easeOut});
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+
+                console.log("windowResize is working");
+            }
+
+            function animate() {
+                renderer.setAnimationLoop(render);
+            }
+
+            function render() {      
+                renderer.render(scene, camera);
+            }
+        </script>
+    </body>
+</html>
