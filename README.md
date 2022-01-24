@@ -1,5 +1,9 @@
 # Hyperloop_WebAR_demo
- 
+
+To animate
+- Right click on desktop.
+- Tap on mobile.
+
 https://saetbyeolkwon.github.io/Hyperloop_WebAR_demo/
 
 # Web
