@@ -92,7 +92,7 @@
             }
 
             function onSelect() {
-                var duration = 0.5;
+                var duration = 1;
                 var tl = gsap.timeline({repeat: 2, repeatDelay: 1});
 
                 tl.to(rail.position, duration, {x:0, ease: Expo.easeOut})
@@ -100,7 +100,7 @@
                 .to(rail.rotation, 3, {y: Math.PI, ease: Expo.easeOut})
                 .to(rail.position, duration, {x:0, ease: Expo.easeOut})
                 .to(rail.position, duration, {x:-30, ease: Expo.easeOut})
-                .to(rail.rotation, 3, {y: Math.PI, ease: Expo.easeOut})
+                .to(rail.rotation, 3, {y: Math.PI*2, ease: Expo.easeOut})
                 .to(rail.position, duration, {x:0, ease: Expo.easeOut});
             }
 
